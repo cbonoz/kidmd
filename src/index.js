@@ -11,7 +11,6 @@
 const Alexa = require('alexa-sdk');
 const where = require('node-where');
 
-const querys = require('./query');
 const languages = require('./languages');
 const kid = require('./kid');
 
@@ -32,7 +31,7 @@ const newSessionHandlers = {
     },
     'AMAZON.HelpIntent': function () {
         this.handler.state = GAME_STATES.DOCTOR;
-        this.emitWithState('HelpUserIntent', true);
+        this.emitWithState('AMAZON.HelpIntent', true);
     },
     'Unhandled': function () {
         const speechOutput = this.t('DOCTOR_UNHANDLED');
@@ -46,13 +45,13 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
         const self = this;
         self.handler.state = GAME_STATES.DOCTOR;
         // TODO: prompt the user for a query.
-        const message = this.t('QUESTION_MESSAGE')
+        const message = this.t('DOCTOR_MESSAGE')
         self.response.speak(message).listen(message);
         self.emit(":responseReady");
     },
     'DoctorIntent': function() {
         const self = this;
-        self.handler.state = GAME_STATES.QUESTION;
+        self.handler.state = GAME_STATES.DOCTOR;
         const intent = self.event.request.intent;
         const query = intent.slots.Query.value || '';
         const location = intent.slots.City.value || '';
@@ -92,7 +91,7 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
     /* Amazon intents below */
 
     'AMAZON.StartOverIntent': function () {
-        this.handler.state = GAME_STATES.QUESTION;
+        this.handler.state = GAME_STATES.DOCTOR;
         this.emitWithState('QuestionIntent', false);
     },
     'AMAZON.RepeatIntent': function () {
@@ -101,7 +100,7 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
     },
     'AMAZON.HelpIntent': function () {
         this.handler.state = GAME_STATES.HELP;
-        const askMessage = newGame ? this.t('ASK_MESSAGE_QUESTION') : this.t('REPEAT_QUESTION_MESSAGE') + this.t('STOP_MESSAGE');
+        const askMessage = newGame ? this.t('ASK_MESSAGE_DOCTOR') : this.t('REPEAT_DOCTOR_MESSAGE') + this.t('STOP_MESSAGE');
         const speechOutput = this.t('HELP_MESSAGE', GAME_LENGTH) + askMessage;
         const repromptText = this.t('HELP_REPROMPT') + askMessage;
 
@@ -119,7 +118,7 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
         this.emit(':responseReady');
     },
     'Unhandled': function () {
-        const speechOutput = this.t('QUESTION_UNHANDLED', ANSWER_COUNT.toString());
+        const speechOutput = this.t('DOCTOR_UNHANDLED', ANSWER_COUNT.toString());
         this.response.speak(speechOutput).listen(speechOutput);
         this.emit(':responseReady');
     },
