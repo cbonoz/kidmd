@@ -52,12 +52,12 @@ const newSessionHandlers = {
 
             const city = result.get('city');
             const code = result.get('regionCode');
-
+        
             const locationSlug = `${code}-${city}`.toLowerCase();
             console.log('locationSlug: ' + locationSlug);
-
+        
             kid.getDoctors(locationSlug).then((res) => {
-                const doctorResponse = kid.process(res);
+                const message = kid.processDoctors(query, res);
                 self.response.speak(message).listen(message);
                 self.emit(':responseReady');
             }).catch((err) => {
