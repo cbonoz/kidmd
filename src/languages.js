@@ -10,6 +10,7 @@ const library = (function () {
             'translation': {
                 'QUESTION_MESSAGE': 'Welcome to Kid MD, what problem are you having?',
                 'GAME_NAME': 'Kid MD', // Be sure to change this for your skill.
+                'CONSULT_MESSAGE': 'Doctors Nearby:',
                 'HELP_MESSAGE': 'I will ask you %s multiple choice questions. Respond with the number of the answer. ' +
                     'For example, say one, two, three, or four. To start a new game at any time, say, start game. ',
                 'REPEAT_QUESTION_MESSAGE': 'To repeat the last question, say, repeat. ',

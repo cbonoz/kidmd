@@ -4,6 +4,19 @@
       "intent": "LaunchRequest"
     },
     {
+      "intent": "ProblemIntent",
+      "slots": [
+        {
+          "name": "Relative",
+          "type": "RELATIVE"
+        },
+        {
+          "name": "Problem",
+          "type": "PROBLEM"
+        }
+      ]
+    },
+    {
       "intent": "DoctorIntent",
       "slots": [
         {

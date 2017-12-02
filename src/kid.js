@@ -27,9 +27,9 @@ const library = (function () {
             return d['practices'][0]['name'];
         });
         const doctorString = doctors.join(', ')
-        let message = `We found the following doctors in your area for ${query}: `;
+        let message = `We have some nearby providers that can help you around the ${query}: `;
         message += `${doctorString}`;
-        message += ". Would you like to make an appointment?"
+        message += ". Would you like to make an appointment with one?"
         return message;
     }
 

@@ -20,22 +20,37 @@ const GAME_STATES = {
 
 const APP_ID = undefined; // TODO replace with your app ID (OPTIONAL)
 
+
 const newSessionHandlers = {
     'LaunchRequest': function () {
         this.emit('QuestionIntent');
     },
+   
     'QuestionIntent': function () {
         const self = this;
         // TODO: prompt the user for a query.
-        const message = this.t('DOCTOR_MESSAGE')
+        const message = this.t('QUESTION_MESSAGE')
         self.response.speak(message).listen(message);
         self.emit(":responseReady");
+    },
+    'WhereIntent': function(relative) {
+        const self = this;
+        let message = "";
+        if (relative) {
+            message = `Your ${relative}'s problem could be bad, you may be interested in consulting a doctor nearby`;
+        } else {
+            message = `Could be bad, you may be interested in consulting a doctor nearby`;
+        }
+        console.log('whereintent', message);
+        self.response.speak(message).listen(message);
+        self.emit(':responseReady');
     },
     'DoctorIntent': function () {
         const self = this;
         const intent = self.event.request.intent;
         const query = intent.slots.Query.value || '';
         const location = intent.slots.City.value || '';
+
         console.log('DoctorIntent query: ' + query);
         if (!location) {
             self.emit('AMAZON.RepeatIntent');
@@ -57,8 +72,10 @@ const newSessionHandlers = {
             console.log('locationSlug: ' + locationSlug);
         
             kid.getDoctors(locationSlug).then((res) => {
-                const message = kid.processDoctors(query, res);
+                let baseMessage = "";
+                const message = baseMessage + kid.processDoctors(query, res);
                 self.response.speak(message).listen(message);
+                self.response.cardRenderer(self.t('CONSULT_MESSAGE', message));
                 self.emit(':responseReady');
             }).catch((err) => {
                 const message = `${err}, say another query.`;
@@ -105,11 +122,38 @@ const newSessionHandlers = {
     }
 };
 
+const problemHandlers = {
+    'ProblemIntent': function() {
+        const self = this;
+        const intent = self.event.request.intent;
+        const problem = intent.slots.Problem.value || '';
+        const relative = intent.slots.Relative.value || undefined;
+        console.log(`problem: ${problem}, relative: ${relative}`);
+        // TODO: parse and understand the user's problem (currently direct to DoctorIntent).
+        this.emit('WhereIntent', relative);
+    }
+}
+
+const appointmentHandlers = {
+    'AMAZON.YesIntent': function () {
+        const speechOutput = "Ok, what time would you like to make an appointment?"
+        this.response.speak(speechOutput).listen(speechOutput);
+        this.emit(':responseReady');
+    },
+    'AMAZON.NoIntent': function () {
+        const speechOutput = "Ok, no problem. Ask me again later."
+        this.response.speak(speechOutput).listen(speechOutput);
+        this.emit(':responseReady');
+    },
+    // 'AppointmentIntent': function() {
+    // },
+}
+
 exports.handler = function (event, context) {
     const alexa = Alexa.handler(event, context);
     alexa.appId = APP_ID;
     // To enable string internationalization (i18n) features, set a resources object.
     alexa.resources = languages.languageString;
-    alexa.registerHandlers(newSessionHandlers);//, queryStateHandlers);
+    alexa.registerHandlers(newSessionHandlers, problemHandlers, appointmentHandlers);//, queryStateHandlers);
     alexa.execute();
 };
