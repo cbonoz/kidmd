@@ -22,46 +22,27 @@ const APP_ID = undefined; // TODO replace with your app ID (OPTIONAL)
 
 const newSessionHandlers = {
     'LaunchRequest': function () {
-        this.handler.state = GAME_STATES.DOCTOR;
-        this.emitWithState('QuestionIntent', true);
+        this.emit('QuestionIntent');
     },
-    'AMAZON.StartOverIntent': function () {
-        this.handler.state = GAME_STATES.DOCTOR;
-        this.emitWithState('QuestionIntent', true);
-    },
-    'AMAZON.HelpIntent': function () {
-        this.handler.state = GAME_STATES.DOCTOR;
-        this.emitWithState('AMAZON.HelpIntent', true);
-    },
-    'Unhandled': function () {
-        const speechOutput = this.t('DOCTOR_UNHANDLED');
-        this.response.speak(speechOutput).listen(speechOutput);
-        this.emit(':responseReady');
-    },
-};
-
-const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
     'QuestionIntent': function () {
         const self = this;
-        self.handler.state = GAME_STATES.DOCTOR;
         // TODO: prompt the user for a query.
         const message = this.t('DOCTOR_MESSAGE')
         self.response.speak(message).listen(message);
         self.emit(":responseReady");
     },
-    'DoctorIntent': function() {
+    'DoctorIntent': function () {
         const self = this;
-        self.handler.state = GAME_STATES.DOCTOR;
         const intent = self.event.request.intent;
         const query = intent.slots.Query.value || '';
         const location = intent.slots.City.value || '';
         console.log('DoctorIntent query: ' + query);
         if (!location) {
-            self.emitWithState('AMAZON.RepeatIntent', false);
+            self.emit('AMAZON.RepeatIntent');
             return;
         }
 
-        where.is(location, function(err, result) {
+        where.is(location, function (err, result) {
             if (err) {
                 const message = `${err}, try another query.`;
                 self.response.speak(message).listen(message);
@@ -91,15 +72,13 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
     /* Amazon intents below */
 
     'AMAZON.StartOverIntent': function () {
-        this.handler.state = GAME_STATES.DOCTOR;
-        this.emitWithState('QuestionIntent', false);
+        this.emit('QuestionIntent', false);
     },
     'AMAZON.RepeatIntent': function () {
         this.response.speak(this.attributes['speechOutput']).listen(this.attributes['repromptText']);
         this.emit(':responseReady');
     },
     'AMAZON.HelpIntent': function () {
-        this.handler.state = GAME_STATES.HELP;
         const askMessage = newGame ? this.t('ASK_MESSAGE_DOCTOR') : this.t('REPEAT_DOCTOR_MESSAGE') + this.t('STOP_MESSAGE');
         const speechOutput = this.t('HELP_MESSAGE', GAME_LENGTH) + askMessage;
         const repromptText = this.t('HELP_REPROMPT') + askMessage;
@@ -108,7 +87,6 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
         this.emit(':responseReady');
     },
     'AMAZON.StopIntent': function () {
-        this.handler.state = GAME_STATES.HELP;
         const speechOutput = this.t('STOP_MESSAGE');
         this.response.speak(speechOutput).listen(speechOutput);
         this.emit(':responseReady');
@@ -124,14 +102,14 @@ const queryStateHandlers = Alexa.CreateStateHandler(GAME_STATES.DOCTOR, {
     },
     'SessionEndedRequest': function () {
         console.log(`Session ended in query state: ${this.event.request.reason}`);
-    },
-});
+    }
+};
 
 exports.handler = function (event, context) {
     const alexa = Alexa.handler(event, context);
     alexa.appId = APP_ID;
     // To enable string internationalization (i18n) features, set a resources object.
     alexa.resources = languages.languageString;
-    alexa.registerHandlers(newSessionHandlers, queryStateHandlers);
+    alexa.registerHandlers(newSessionHandlers);//, queryStateHandlers);
     alexa.execute();
 };
