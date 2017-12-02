@@ -4,3 +4,5 @@ node_modules/
 node_modules
 .idea/
 .idea
+src/api.js
+src/test.js

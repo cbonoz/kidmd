@@ -1,0 +1,4 @@
+DoctorIntent doctor for {Query} near {City}
+DoctorIntent help me with {Query} near {City}
+DoctorIntent doctor near {City}
+DoctorIntent find a doctor for {Query} near {City}
