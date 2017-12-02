@@ -40,3 +40,14 @@ Prepare for aws submission (run zip command from /src):
 ```
  zip -r -X ../src.zip *
 ```
+
+
+### Sample Dialog
+
+'Alexa, open kid md'<br/>
+...<br/>
+'My son may have a bad flu'<br/>
+...<br/>
+is there a doctor near boston, massachusetts?<br/>
+...<br/>
+yes<br/>
